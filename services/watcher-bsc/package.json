@@ -1,0 +1,21 @@
+{
+    "name":  "@testcoin/watcher-bsc",
+    "version":  "0.1.0",
+    "private":  true,
+    "scripts":  {
+                    "dev":  "ts-node-dev --respawn --transpile-only src/index.ts",
+                    "build":  "tsc -p tsconfig.json",
+                    "start":  "node dist/index.js",
+                    "test":  "echo no-tests"
+                },
+    "dependencies":  {
+                         "@prisma/client":  "^6.3.1",
+                         "ethers":  "^6.13.5"
+                     },
+    "devDependencies":  {
+                            "@types/node":  "^22.10.5",
+                            "ts-node":  "^10.9.2",
+                            "ts-node-dev":  "^2.0.0",
+                            "typescript":  "^5.7.3"
+                        }
+}

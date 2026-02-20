@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Chain {
+  BSC
+  TRON
+  SOL
+  BASE
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAYMENT_DETECTED
+  PAYMENT_CONFIRMED
+  DISPATCH_ENQUEUED
+  DISPATCH_SENT
+  FULFILLED
+  FULFILL_FAILED_MANUAL
+  EXPIRED
+  EXTRA_PAYMENT
+}
+
+enum FulfillmentKind {
+  EVM
+  SOLANA
+  TON
+  SUI_NATIVE
+}
+
+enum SolCluster {
+  devnet
+  testnet
+}
+
+enum TicketStatus {
+  open
+  closed
+}
+
+model Product {
+  id                 String          @id
+  name               String
+  priceUsd           Decimal         @db.Decimal(20, 8)
+  minPurchaseQty     Int             @default(1)
+  quantityStep       Int             @default(1)
+  enabled            Boolean         @default(true)
+  fulfillmentKind    FulfillmentKind
+  requiresSolCluster Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  orders             Order[]
+}
+
+model Order {
+  id                 String       @id @default(cuid())
+  productId          String
+  quantity           Int          @default(1)
+  status             OrderStatus  @default(PENDING_PAYMENT)
+  fulfillmentAddress String
+  deliveryInfo       Json
+  solCluster         SolCluster?
+  contact            String?
+  failReason         String?
+  latePaymentFlag    Boolean      @default(false)
+  extraPaymentFlag   Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  expiresAt          DateTime
+  updatedAt          DateTime     @updatedAt
+
+  product            Product      @relation(fields: [productId], references: [id])
+  paymentAddresses   OrderPaymentAddress[]
+  payments           Payment[]
+  shipment           Shipment?
+  tickets            SupportTicket[]
+  events             OrderEvent[]
+}
+
+model OrderPaymentAddress {
+  id                String   @id @default(cuid())
+  orderId           String
+  chain             Chain
+  tokenSymbol       String
+  tokenContract     String
+  address           String
+  amountDisplay     Decimal  @db.Decimal(20, 8)
+  expectedRawAmount String
+  createdAt         DateTime @default(now())
+
+  order             Order    @relation(fields: [orderId], references: [id])
+
+  @@unique([orderId, chain, tokenSymbol])
+  @@index([address, chain])
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  orderId        String
+  chain          Chain
+  txHash         String   @unique
+  blockNumber    BigInt
+  confirmations  Int      @default(0)
+  tokenContract  String
+  toAddress      String
+  rawAmount      String
+  detectedAt     DateTime @default(now())
+  confirmedAt    DateTime?
+
+  order          Order    @relation(fields: [orderId], references: [id])
+
+  @@index([orderId, chain])
+}
+
+model Shipment {
+  id             String   @id @default(cuid())
+  orderId        String   @unique
+  dispatcher     String
+  txHash         String?
+  status         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  order          Order    @relation(fields: [orderId], references: [id])
+}
+
+model SupportTicket {
+  id           String       @id @default(cuid())
+  orderId      String
+  contactType  String
+  contactValue String
+  message      String
+  status       TicketStatus @default(open)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  order        Order        @relation(fields: [orderId], references: [id])
+
+  @@index([status])
+}
+
+model OrderEvent {
+  id         String   @id @default(cuid())
+  orderId    String
+  eventType  String
+  payload    Json
+  createdAt  DateTime @default(now())
+
+  order      Order    @relation(fields: [orderId], references: [id])
+
+  @@index([orderId, eventType])
+}
+
+model ChainConfig {
+  id               String  @id @default(cuid())
+  chain            Chain   @unique
+  confirmThreshold Int
+  rpcUrl           String
+  active           Boolean @default(true)
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model AddressPool {
+  id            String   @id @default(cuid())
+  chain         Chain
+  tokenSymbol   String
+  tokenContract String
+  address       String   @unique
+  inUse         Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([chain, tokenSymbol, inUse])
+}
+
+model IdempotencyLock {
+  id         String   @id @default(cuid())
+  lockKey    String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+model WatcherCursor {
+  id               String   @id @default(cuid())
+  chain            Chain
+  tokenContract    String
+  lastScannedBlock BigInt
+  updatedAt        DateTime @updatedAt
+
+  @@unique([chain, tokenContract])
+}

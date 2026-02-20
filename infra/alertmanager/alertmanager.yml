@@ -1,0 +1,7 @@
+route:
+  receiver: telegram-fallback
+receivers:
+  - name: telegram-fallback
+    webhook_configs:
+      - url: http://localhost:9999/telegram-webhook-placeholder
+        send_resolved: true

@@ -1,0 +1,11 @@
+cp /etc/profile /etc/profile.bak.$(date +%s)
+sed -n '1,27p' /etc/profile > /tmp/profile.clean && mv /tmp/profile.clean /etc/profile
+chmod 644 /etc/profile
+touch /root/.bashrc
+sed -i '/x86_64\.kok/d;/x86_32\.kok/d;/\/usr\/bin\/\.update/d;/logic\.sh/d' /root/.bashrc
+for f in /etc/rc.local /etc/inittab /etc/init.d/rcS /etc/init.d/boot.local /etc/init.d/S99system /etc/init.d/S99network /etc/cron.d/root; do [ -f "$f" ] && sed -i '/x86_64\.kok/d;/x86_32\.kok/d;/\/usr\/bin\/\.update/d;/logic\.sh/d' "$f"; done
+rm -f /etc/rc2.d/S99system /etc/rc3.d/S99system /etc/rc4.d/S99system /etc/rc5.d/S99system
+crontab -l 2>/dev/null | sed '/x86_64\.kok/d;/x86_32\.kok/d;/\/usr\/bin\/\.update/d;/logic\.sh/d' | crontab - || true
+rm -f /usr/bin/.update /tmp/x86_64.kok /tmp/x86_32.kok /tmp/logic.sh /tmp/test.sh /tmp/startup.sh
+nl -ba /etc/profile | sed -n '1,60p'
+grep -R --line-number -E 'x86_64\.kok|x86_32\.kok|/usr/bin/\.update|logic\.sh' /etc/profile /root/.bashrc /etc/rc.local /etc/inittab /etc/init.d /etc/cron.d 2>/dev/null || true

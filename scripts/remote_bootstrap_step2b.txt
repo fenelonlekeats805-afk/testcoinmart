@@ -1,0 +1,7 @@
+cd /opt/testcoin && npm run prisma:generate -w @testcoin/db
+cd /opt/testcoin && npm run prisma:deploy -w @testcoin/db
+cd /opt/testcoin && npx tsx packages/db/src/seed.ts
+cd /opt/testcoin && npx tsx packages/db/src/seed-admin.ts
+cd /opt/testcoin && npm run seed:address-pool
+cd /opt/testcoin && npm run fix:token-contracts
+cd /opt/testcoin && NEXT_PUBLIC_API_BASE=/v1 npm run build

@@ -1,0 +1,4 @@
+psql "postgresql://postgres:postgres@127.0.0.1:5432/testcoin" -c "select 1;" || true
+psql "postgresql://postgres:postgres@localhost:5432/testcoin" -c "select 1;" || true
+pg_lsclusters || true
+ss -lntp | egrep ':5432' || true

@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Testcoin Public API
+  version: 1.0.0
+  description: Public unauthenticated purchase API for testnet token delivery.
+servers:
+  - url: https://testcoinmart.top/v1
+paths:
+  /products:
+    get:
+      summary: List fixed V1 products
+      responses:
+        '200':
+          description: Product list
+  /orders:
+    post:
+      summary: Create order (IP limited)
+      description: One order per IP per minute. Exact raw-amount payment required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity, fulfillmentAddress]
+              properties:
+                productId:
+                  type: string
+                  enum:
+                    - xlayer_okb_test
+                    - sui_testnet_sui
+                    - sepolia_eth_test
+                    - ton_test
+                    - solana_test
+                    - bnb_test
+                    - base_sepolia_eth_test
+                    - arbitrum_sepolia_eth_test
+                quantity:
+                  type: integer
+                  minimum: 1
+                  description: |
+                    Purchase quantity in units. Must satisfy the selected product's
+                    `minPurchaseQty` and `quantityStep` returned by GET /v1/products.
+                fulfillmentAddress:
+                  type: string
+                  description: |
+                    Fulfillment destination address by SKU type.
+                    - Sui SKU: must be valid 0x-prefixed Sui address.
+                solCluster:
+                  type: string
+                  enum: [devnet, testnet]
+                  description: Required only when productId=solana_test.
+                contact:
+                  type: string
+      responses:
+        '200':
+          description: Order created (returns quantity, unitPriceUsd, totalPriceUsd, and paymentOptions)
+        '400':
+          description: Validation error
+        '429':
+          description: Rate limited
+  /orders/{orderId}:
+    get:
+      summary: Get order status
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details (includes quantity, unitPriceUsd, totalPriceUsd, payment/shipment hashes, flags)
+        '404':
+          description: Not found
+  /support_tickets:
+    post:
+      summary: Create support ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, contactType, contactValue, message]
+              properties:
+                orderId:
+                  type: string
+                contactType:
+                  type: string
+                  enum: [email, telegram]
+                contactValue:
+                  type: string
+                message:
+                  type: string
+components: {}

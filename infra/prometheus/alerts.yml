@@ -1,0 +1,26 @@
+groups:
+  - name: testcoin-v1
+    rules:
+      - alert: DispatchFailedManualSpike
+        expr: increase(testcoin_dispatch_failures_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Dispatcher failures detected"
+
+      - alert: ExtraPaymentDetected
+        expr: increase(testcoin_extra_payment_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "EXTRA_PAYMENT detected"
+
+      - alert: NewSupportTicket
+        expr: increase(testcoin_support_ticket_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "New support ticket created"

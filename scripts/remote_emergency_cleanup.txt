@@ -1,0 +1,4 @@
+# WARNING: Emergency cleanup for compromised host.
+# Removes the malicious infinite-loop payload appended to /etc/profile and kills known processes.
+# Use non-login shell to avoid sourcing /etc/profile (which may be compromised).
+bash -c 'set -euo pipefail; echo "[cleanup] trimming /etc/profile"; cp -a /etc/profile /etc/profile.bak.$(date +%s); sed -i "/^while true/,\$d" /etc/profile; echo "[cleanup] killed processes"; pkill -f "/usr/bin/.update" || true; pkill -f "x86_64.kok" || true; pkill -f "x86_32.kok" || true; echo "[cleanup] removing artifacts"; rm -f /usr/bin/.update /tmp/x86_64.kok /tmp/x86_32.kok || true; echo "[cleanup] done"; tail -n 5 /etc/profile; ls -la /etc/profile.bak.* | tail -n 1'

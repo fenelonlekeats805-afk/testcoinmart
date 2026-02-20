@@ -1,0 +1,12 @@
+cd /opt/testcoin && grep -q '^NEXT_PUBLIC_API_BASE=' .env && sed -i 's|^NEXT_PUBLIC_API_BASE=.*|NEXT_PUBLIC_API_BASE=/v1|' .env || echo 'NEXT_PUBLIC_API_BASE=/v1' >> .env
+cd /opt/testcoin && grep -q '^SERVER_API_BASE=' .env && sed -i 's|^SERVER_API_BASE=.*|SERVER_API_BASE=http://127.0.0.1:3001/v1|' .env || echo 'SERVER_API_BASE=http://127.0.0.1:3001/v1' >> .env
+cd /opt/testcoin && grep -q '^CORS_ORIGINS=' .env && sed -i 's|^CORS_ORIGINS=.*|CORS_ORIGINS=http://testcoinmart.top,http://www.testcoinmart.top,http://admin.testcoinmart.top,https://testcoinmart.top,https://www.testcoinmart.top,https://admin.testcoinmart.top,http://192.227.147.140,https://192.227.147.140|' .env || echo 'CORS_ORIGINS=http://testcoinmart.top,http://www.testcoinmart.top,http://admin.testcoinmart.top,https://testcoinmart.top,https://www.testcoinmart.top,https://admin.testcoinmart.top,http://192.227.147.140,https://192.227.147.140' >> .env
+cd /opt/testcoin && grep -q '^NODE_ENV=' .env && sed -i 's|^NODE_ENV=.*|NODE_ENV=production|' .env || echo 'NODE_ENV=production' >> .env
+cd /opt/testcoin && npm install
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npm run prisma:generate -w @testcoin/db'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npm run prisma:deploy -w @testcoin/db'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npx tsx packages/db/src/seed.ts'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npx tsx packages/db/src/seed-admin.ts'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npm run seed:address-pool'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && npm run fix:token-contracts'
+bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run build'

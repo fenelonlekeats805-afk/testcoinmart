@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: 'api'
+    static_configs:
+      - targets: ['api:3001']
+
+  - job_name: 'watchers'
+    static_configs:
+      - targets:
+        - 'watcher-bsc:9464'
+        - 'watcher-tron:9464'
+        - 'watcher-sol:9464'
+        - 'watcher-base:9464'
+
+  - job_name: 'dispatchers'
+    static_configs:
+      - targets:
+        - 'dispatcher-evm:9464'
+        - 'dispatcher-solana:9464'
+        - 'dispatcher-ton:9464'
+        - 'dispatcher-sui:9464'

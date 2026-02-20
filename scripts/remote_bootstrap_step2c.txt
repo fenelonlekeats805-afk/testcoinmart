@@ -1,0 +1,7 @@
+cd /opt/testcoin && sed -i 's/\r$//' .env
+cd /opt/testcoin && set -a && . ./.env && set +a && npm run prisma:deploy -w @testcoin/db
+cd /opt/testcoin && set -a && . ./.env && set +a && npx tsx packages/db/src/seed.ts
+cd /opt/testcoin && set -a && . ./.env && set +a && npx tsx packages/db/src/seed-admin.ts
+cd /opt/testcoin && set -a && . ./.env && set +a && npm run seed:address-pool
+cd /opt/testcoin && set -a && . ./.env && set +a && npm run fix:token-contracts
+cd /opt/testcoin && set -a && . ./.env && set +a && NEXT_PUBLIC_API_BASE=/v1 npm run build

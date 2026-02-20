@@ -1,0 +1,8 @@
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+sudo -u postgres dropdb --if-exists testcoin
+sudo -u postgres createdb testcoin
+rm -rf /opt/testcoin
+mkdir -p /opt/testcoin
+tar -xzf /root/deploy.tar.gz -C /opt/testcoin
+cp /root/.env /opt/testcoin/.env
+ls -la /opt/testcoin

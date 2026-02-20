@@ -1,0 +1,6 @@
+cd /opt/testcoin && grep -q '^TON_SENDER_SECRET_KEY_HEX=' .env && sed -i 's|^TON_SENDER_SECRET_KEY_HEX=.*|TON_SENDER_SECRET_KEY_HEX="session borrow rural quality crime embrace trial tape shaft whisper fish acoustic simple author wonder liquid eager concert twin hotel vessel orient private cabin"|' .env || echo 'TON_SENDER_SECRET_KEY_HEX="session borrow rural quality crime embrace trial tape shaft whisper fish acoustic simple author wonder liquid eager concert twin hotel vessel orient private cabin"' >> .env
+cd /opt/testcoin && set -a && source .env && set +a && echo "TON_ENV_OK words=$(echo \"$TON_SENDER_SECRET_KEY_HEX\" | awk '{print NF}')"
+cd /opt/testcoin/apps/web/public && [ -f favicon.ico ] || cp logos/logo.png favicon.ico
+pm2 restart dispatcher-ton web
+pm2 status | sed -n '1,40p'
+curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1/favicon.ico

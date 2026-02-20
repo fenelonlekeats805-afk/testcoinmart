@@ -1,0 +1,168 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testcoin
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+
+  api:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/api"
+    volumes:
+      - ..:/workspace
+    ports:
+      - '3001:3001'
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    environment:
+      NEXT_PUBLIC_API_BASE: /v1
+    command: sh -c "npm install && npm run dev -w @testcoin/web"
+    volumes:
+      - ..:/workspace
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+  admin:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    environment:
+      NEXT_PUBLIC_API_BASE: /v1
+    command: sh -c "npm install && npm run dev -w @testcoin/admin"
+    volumes:
+      - ..:/workspace
+    ports:
+      - '3002:3002'
+    depends_on:
+      - api
+
+  watcher-bsc:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/watcher-bsc"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  watcher-tron:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/watcher-tron"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  watcher-sol:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/watcher-sol"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  watcher-base:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/watcher-base"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  dispatcher-evm:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/dispatcher-evm"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  dispatcher-solana:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/dispatcher-solana"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  dispatcher-ton:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/dispatcher-ton"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  dispatcher-sui:
+    image: node:20
+    working_dir: /workspace
+    env_file:
+      - ../.env
+    command: sh -c "npm install && npm run dev -w @testcoin/dispatcher-sui"
+    volumes:
+      - ..:/workspace
+    depends_on:
+      - api
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml
+    ports:
+      - '9090:9090'
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - '9093:9093'
+
+volumes:
+  pgdata:

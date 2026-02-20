@@ -1,0 +1,7 @@
+# Debug postgres TCP connectivity
+psql "postgresql://postgres:postgres@localhost:5432/testcoin" -c "select 1;" || true
+sudo -u postgres psql -c "select 1;"
+ss -lntp | egrep ':5432' || true
+grep -n "^[# ]*listen_addresses" /etc/postgresql/*/main/postgresql.conf || true
+grep -n "^[# ]*port" /etc/postgresql/*/main/postgresql.conf || true
+*** End Patch"}]}So not JSON. Let's apply patch correctly. We'll create file with those lines. We'll use apply_patch. Let's do. }"}] } json? Actually apply_patch freeform. We'll do.}            } } } ? We'll call apply_patch with correct patch. We'll do.}"}] }.

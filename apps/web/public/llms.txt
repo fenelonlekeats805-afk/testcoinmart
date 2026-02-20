@@ -1,0 +1,30 @@
+# TestCoin Mart
+
+Website: https://testcoinmart.top
+Brand: TestCoin Mart
+Tagline: Buy testnet coins. Ship in minutes.
+
+## Canonical agent entrypoints
+- Skills index: https://testcoinmart.top/v1/skills
+- Marketplace default skill: https://testcoinmart.top/v1/skills/get-test-faucet
+- Faucet-first skill: https://testcoinmart.top/v1/skills/faucet-first
+- Purchase skill: https://testcoinmart.top/v1/skills/buy
+- OpenAPI: https://testcoinmart.top/v1/skills/openapi.yaml
+
+## Public purchase API
+- List products: GET https://testcoinmart.top/v1/products
+- Create order: POST https://testcoinmart.top/v1/orders
+- Query order: GET https://testcoinmart.top/v1/orders/{order_id}
+
+## Purchase constraints for agents
+1. Use exact amount from paymentOptions.
+2. Use designated chain/token/address for the order.
+3. Treat repeated payment as manual-review risk.
+4. Poll every 3-5 seconds until:
+   - FULFILLED
+   - FULFILL_FAILED_MANUAL
+   - EXPIRED
+
+## Human-readable docs
+- Skills guide: https://testcoinmart.top/skills
+- Faucet-first guide: https://testcoinmart.top/guides/faucet-first

@@ -1,0 +1,164 @@
+{
+  "name": "testcoin-faucet-first-skill",
+  "version": "1.0.0",
+  "description": "Get testnet tokens by trying official faucets first, then fallback to Testcoin paid purchase API when faucet is insufficient.",
+  "openapi": "./openapi.yaml",
+  "research": "../research/faucets.md",
+  "entrypoint": "run_faucet_first_purchase",
+  "inputs": {
+    "productId": {
+      "type": "string",
+      "enum": [
+        "xlayer_okb_test",
+        "sui_testnet_sui",
+        "sepolia_eth_test",
+        "ton_test",
+        "solana_test",
+        "bnb_test",
+        "base_sepolia_eth_test",
+        "arbitrum_sepolia_eth_test"
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "fulfillmentAddress": {
+      "type": "string"
+    },
+    "solCluster": {
+      "type": "string",
+      "enum": ["devnet", "testnet"],
+      "requiredWhenProductId": "solana_test"
+    },
+    "timeBudgetSeconds": {
+      "type": "integer",
+      "default": 180
+    }
+  },
+  "faucetPolicy": {
+    "maxAttemptsPerRoute": 2,
+    "tryOrder": [
+      "official_api",
+      "official_cli",
+      "official_web"
+    ],
+    "fallbackConditions": [
+      "faucet_claim_failed",
+      "faucet_rate_limited",
+      "insufficient_balance_after_claim",
+      "time_budget_exceeded"
+    ]
+  },
+  "productFaucets": {
+    "xlayer_okb_test": [
+      {
+        "type": "official_web",
+        "url": "https://web3.okx.com/xlayer/faucet",
+        "automation": "manual_or_semi_auto"
+      },
+      {
+        "type": "official_docs",
+        "url": "https://www.okx.com/web3/build/docs"
+      }
+    ],
+    "sui_testnet_sui": [
+      {
+        "type": "official_api",
+        "url": "https://faucet.testnet.sui.io/v2/gas",
+        "method": "POST",
+        "payloadExample": {
+          "FixedAmountRequest": {
+            "recipient": "0x..."
+          }
+        },
+        "automation": "auto"
+      },
+      {
+        "type": "official_docs",
+        "url": "https://docs.sui.io/guides/developer/getting-started/get-coins"
+      }
+    ],
+    "sepolia_eth_test": [
+      {
+        "type": "official_docs",
+        "url": "https://ethereum.org/en/developers/docs/networks/"
+      },
+      {
+        "type": "faucet_reference",
+        "url": "https://faucets.chain.link/sepolia",
+        "automation": "manual_or_semi_auto"
+      }
+    ],
+    "ton_test": [
+      {
+        "type": "official_docs",
+        "url": "https://docs.ton.org/v3/guidelines/smart-contracts/getting-started/testnet"
+      },
+      {
+        "type": "official_bot",
+        "url": "https://t.me/testgiver_ton_bot",
+        "automation": "manual_or_semi_auto"
+      }
+    ],
+    "solana_test": [
+      {
+        "type": "official_docs",
+        "url": "https://solana.com/docs/references/clusters"
+      },
+      {
+        "type": "official_faucet",
+        "url": "https://faucet.solana.com/",
+        "automation": "manual_or_semi_auto"
+      },
+      {
+        "type": "official_cli_docs",
+        "url": "https://solana.com/developers/cookbook/development/test-sol",
+        "automation": "auto"
+      }
+    ],
+    "bnb_test": [
+      {
+        "type": "official_web",
+        "url": "https://www.bnbchain.org/en/testnet-faucet",
+        "automation": "manual_or_semi_auto"
+      },
+      {
+        "type": "official_docs",
+        "url": "https://docs.bnbchain.org/bnb-smart-chain/developers/faucet/"
+      }
+    ],
+    "base_sepolia_eth_test": [
+      {
+        "type": "official_docs",
+        "url": "https://docs.base.org/base-chain/network-information/network-faucets",
+        "automation": "manual_or_semi_auto"
+      }
+    ],
+    "arbitrum_sepolia_eth_test": [
+      {
+        "type": "official_docs",
+        "url": "https://docs.arbitrum.io/for-devs/dev-tools-and-resources/chain-info",
+        "automation": "manual_or_semi_auto"
+      }
+    ]
+  },
+  "purchaseFlow": [
+    "GET /v1/products",
+    "Validate quantity with minPurchaseQty and quantityStep",
+    "POST /v1/orders",
+    "Pick one payment option and send exact stablecoin amount",
+    "Poll GET /v1/orders/{orderId} every 3-5 seconds"
+  ],
+  "terminalStatus": [
+    "FULFILLED",
+    "FULFILL_FAILED_MANUAL",
+    "EXPIRED"
+  ],
+  "hardRules": [
+    "Never pay non-stablecoin for order settlement",
+    "Must match exact expectedRawAmount",
+    "Do not duplicate payment to same order address",
+    "If order expired, do not auto-pay"
+  ]
+}

@@ -1,0 +1,22 @@
+cp /root/nginx-testcoinmart.conf /etc/nginx/sites-available/testcoinmart.conf
+ln -sf /etc/nginx/sites-available/testcoinmart.conf /etc/nginx/sites-enabled/testcoinmart.conf
+rm -f /etc/nginx/sites-enabled/default
+nginx -t
+systemctl stop nginx || true
+killall -9 nginx || true
+systemctl start nginx || true
+pm2 delete all || true
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/api'" --name api
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/web'" --name web
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/admin'" --name admin
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/watcher-bsc'" --name watcher-bsc
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/watcher-base'" --name watcher-base
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/watcher-tron'" --name watcher-tron
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/watcher-sol'" --name watcher-sol
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/dispatcher-evm'" --name dispatcher-evm
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/dispatcher-solana'" --name dispatcher-solana
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/dispatcher-ton'" --name dispatcher-ton
+pm2 start "bash -c 'cd /opt/testcoin && set -a && source .env && set +a && export NODE_ENV=production && npm run start -w @testcoin/dispatcher-sui'" --name dispatcher-sui
+pm2 save
+pm2 startup systemd -u root --hp /root
+pm2 status

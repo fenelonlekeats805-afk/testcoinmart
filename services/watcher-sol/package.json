@@ -1,0 +1,22 @@
+{
+    "name":  "@testcoin/watcher-sol",
+    "version":  "0.1.0",
+    "private":  true,
+    "scripts":  {
+                    "dev":  "ts-node-dev --respawn --transpile-only src/index.ts",
+                    "build":  "tsc -p tsconfig.json",
+                    "start":  "node dist/index.js",
+                    "test":  "echo no-tests"
+                },
+    "dependencies":  {
+                         "@prisma/client":  "^6.3.1",
+                         "@solana/web3.js":  "^1.98.0",
+                         "@solana/spl-token":  "^0.4.9"
+                     },
+    "devDependencies":  {
+                            "@types/node":  "^22.10.5",
+                            "ts-node":  "^10.9.2",
+                            "ts-node-dev":  "^2.0.0",
+                            "typescript":  "^5.7.3"
+                        }
+}

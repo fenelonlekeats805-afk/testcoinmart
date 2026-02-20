@@ -1,0 +1,42 @@
+# Base OS packages + services for TestCoin Mart (Ubuntu 22.04)
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+apt-get update -y
+apt-get install -y ca-certificates curl gnupg lsb-release git build-essential python3 make g++ jq unzip
+
+# Basic firewall + ssh brute-force protection (low-risk defaults)
+apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" ufw fail2ban
+ufw allow OpenSSH
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable
+
+# needrestart is useful on larger systems, but on minimal VPS images it can
+# spawn interactive dialogs that break non-interactive provisioning. We'll
+# restart critical services ourselves when needed.
+apt-get remove -y needrestart || true
+
+# Node.js 20 (official NodeSource setup script)
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y nodejs
+
+# Postgres + Redis + Nginx
+apt-get install -y postgresql postgresql-contrib redis-server nginx
+systemctl enable --now postgresql
+systemctl enable --now postgresql@14-main || true
+pg_lsclusters || true
+systemctl enable --now redis-server
+systemctl enable --now nginx
+
+# PM2
+npm install -g pm2
+
+# Fail2ban default jail should be OK once installed; ensure it is running
+systemctl enable --now fail2ban
+
+node -v
+npm -v
+psql --version
+redis-server --version
+nginx -v
+pm2 -v

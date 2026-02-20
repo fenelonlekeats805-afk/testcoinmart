@@ -1,0 +1,25 @@
+{
+    "name":  "testcoin-v1",
+    "private":  true,
+    "version":  "0.1.0",
+    "workspaces":  [
+                       "apps/*",
+                       "packages/*",
+                       "services/*"
+                   ],
+    "scripts":  {
+                    "build":  "npm run build --workspaces --if-present",
+                    "dev":  "npm run dev --workspaces --if-present",
+                    "test":  "npm run test --workspaces --if-present",
+                    "lint":  "npm run lint --workspaces --if-present",
+                    "package:deploy":  "powershell -ExecutionPolicy Bypass -File scripts/package-deploy.ps1",
+                    "seed:address-pool":  "tsx scripts/seed-address-pool.ts",
+                    "fix:token-contracts":  "tsx scripts/fix-payment-token-contracts.ts"
+                },
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "devDependencies":  {
+                            "tsx":  "^4.20.6"
+                        }
+}

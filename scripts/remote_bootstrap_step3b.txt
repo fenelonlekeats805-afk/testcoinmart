@@ -1,0 +1,13 @@
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/api'" --name api
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/web'" --name web
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/admin'" --name admin
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/watcher-bsc'" --name watcher-bsc
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/watcher-base'" --name watcher-base
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/watcher-tron'" --name watcher-tron
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/watcher-sol'" --name watcher-sol
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/dispatcher-evm'" --name dispatcher-evm
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/dispatcher-solana'" --name dispatcher-solana
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/dispatcher-ton'" --name dispatcher-ton
+pm2 start "bash -lc 'cd /opt/testcoin && set -a && source .env && set +a && npm run dev -w @testcoin/dispatcher-sui'" --name dispatcher-sui
+pm2 save
+pm2 status

@@ -1,0 +1,32 @@
+{
+  "name": "testcoin-buy-skill",
+  "version": "1.2.0",
+  "description": "Purchase-only skill for agents (no faucet step). Use testcoin-faucet-first-skill for faucet-first strategy.",
+  "openapi": "./openapi.yaml",
+  "mode": "purchase_only",
+  "alternativeSkill": "./testcoin-faucet-first-skill.json",
+  "requirements": [
+    "Always pay exact amount (raw units must match expectedRawAmount)",
+    "Use quantity that satisfies product minPurchaseQty and quantityStep",
+    "Order expires 10 minutes after creation",
+    "Do not send duplicate payments",
+    "Solana SKU must provide solCluster",
+    "Sui SKU must provide a valid 0x-prefixed Sui address"
+  ],
+  "polling": {
+    "interval_seconds": 3,
+    "terminal_status": [
+      "FULFILLED",
+      "FULFILL_FAILED_MANUAL",
+      "EXPIRED"
+    ]
+  },
+  "flow": [
+    "GET /v1/products",
+    "Pick product and quantity using minPurchaseQty/quantityStep",
+    "POST /v1/orders",
+    "Read paymentOptions and select chain+token",
+    "Send exact stablecoin amount to the provided address",
+    "GET /v1/orders/{order_id} until terminal status"
+  ]
+}
